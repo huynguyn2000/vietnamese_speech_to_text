@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "968220178483",
+    "project_id": "vietnamese-speech-to-tex-ac244",
+    "storage_bucket": "vietnamese-speech-to-tex-ac244.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:968220178483:android:9717cc4bdfd89035b64b46",
+        "android_client_info": {
+          "package_name": "android.app.build.gradle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDExo7iognMLPA90P4vb7Ekd_JWdn0IsUg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
