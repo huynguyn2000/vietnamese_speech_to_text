@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'dart:convert';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:file_picker/file_picker.dart';
 
 class RecordingPage extends StatefulWidget {
   @override
@@ -133,6 +134,22 @@ class _RecordingPageState extends State<RecordingPage> {
     }
   }
 
+  Future<void> pickLocalWavFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['wav'],
+    );
+    if (result != null && result.files.single.path != null) {
+      setState(() {
+        _audioPath = result.files.single.path;
+      });
+      print('Selected local wav file: $_audioPath');
+      await transcribe();
+    } else {
+      print('No file selected');
+    }
+  }
+
   void _onRecordButtonTap() async {
     if (!isRecording) {
       setState(() => isRecording = true);
@@ -146,62 +163,71 @@ class _RecordingPageState extends State<RecordingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // Transcription Display Area
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                color: Colors.grey[200],
-                borderRadius: BorderRadius.circular(12.0),
-              ),
-              child: SingleChildScrollView(
-                child: Text(
-                  transcribedText.isEmpty ?
-                    'Your transcribed text will appear here...' :
-                    transcribedText,
-                  style: TextStyle(
-                    fontSize: 18.0,
-                    color: transcribedText.isEmpty
-                        ? (Theme.of(context).brightness == Brightness.dark
-                            ? Colors.black
-                            : Colors.grey[800])
-                        : null,
+    return Center(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: 500),
+        child: Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              // Transcription Display Area
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[200],
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: SingleChildScrollView(
+                    child: Text(
+                      transcribedText.isEmpty ?
+                        'Your transcribed text will appear here...' :
+                        transcribedText,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        color: transcribedText.isEmpty
+                            ? (Theme.of(context).brightness == Brightness.dark
+                                ? Colors.black
+                                : Colors.grey[800])
+                            : null,
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-
-          // Clear Button
-          if (transcribedText.isNotEmpty)
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  setState(() {
-                    transcribedText = '';
-                  });
-                },
-                icon: Icon(Icons.clear),
-                label: Text('Clear Text'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.redAccent,
-                  foregroundColor: Colors.white,
+              // Clear Button
+              if (transcribedText.isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      setState(() {
+                        transcribedText = '';
+                      });
+                    },
+                    icon: Icon(Icons.clear),
+                    label: Text('Clear Text'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.redAccent,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
                 ),
+              // Recording Button
+              SizedBox(height: 20),
+              RecordButton(
+                isRecording: isRecording,
+                onTap: _onRecordButtonTap,
               ),
-            ),
-
-          // Recording Button
-          SizedBox(height: 20),
-          RecordButton(
-            isRecording: isRecording,
-            onTap: _onRecordButtonTap,
+              SizedBox(height: 12),
+              ElevatedButton.icon(
+                onPressed: pickLocalWavFile,
+                icon: Icon(Icons.upload_file),
+                label: Text('Add Local WAV File'),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
